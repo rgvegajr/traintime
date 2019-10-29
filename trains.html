@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trains</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+        <br>
+        <!-- Jumbotron -->
+        <div class="jumbotron">
+            <h1 class="text-center">Anytime is Train Time</h1>
+        </div>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Train Name</th>
+                    <th scope="col">Destination</th>
+                    <th scope="col">Frequency (minutes)</th>
+                    <th scope="col">Next Arrival</th>
+                    <th scope="col">Minutes Aways</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Midnight</th>
+                    <td>Anywhere</td>
+                    <td>60</td>
+                    <td>12:00 AM</td>
+                    <td>629</td>
+                </tr>
+                <tr>
+                    <th scope="row">L Train</th>
+                    <td>Brooklyn</td>
+                    <td>20</td>
+                    <td>10:00 PM</td>
+                    <td>510</td>
+                </tr>
+                <tr>
+                    <th scope="row">M Train</th>
+                    <td>Queens</td>
+                    <td>10</td>
+                    <td>09:45 PM</td>
+                    <td>495</td>
+                </tr>
+                <tr>
+                    <th scope="row" id="name-data"></th>
+                    <td id="dest-data"></td>
+                    <td id="freq-data"></td>
+                    <td id="firstTrainTime-data"></td>
+                    <td id="minUntilNext-data"></td>
+                </tr>
+
+            </tbody>
+        </table>
+        <form>
+            <div class="form-header">
+                <h2>Add Train</h2>
+            </div>
+            <div class="form-group">
+                <label for="name-input">Train Name</label>
+                <input class="form-control" id="name-input" type="text">
+            </div>
+            <div class="form-group">
+                <label for="dest-input">Destination</label>
+                <input class="form-control" id="dest-input" type="text">
+            </div>
+            <div class="form-group">
+                <label for="firstTrainTime-input">First Train Time (HH:mm - AM/PM)</label>
+                <input class="form-control" id="firstTrainTime-input" type="time" name="time">
+            </div>
+            <div class="form-group">
+                <label for="freq-input">Frequency (min)</label>
+                <input class="form-control" id="freq-input" type="number">
+            </div>
+            <button class="btn btn-primary" id="add-train" type="submit">Submit</button>
+        </form>
+
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!--Moment.js-->
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+
+    <!-- LINKS FOR FIREBASE GO HERE -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-database.js"></script>
+    <!-- Script -->
+    <script>
+        //  START CODING BELOW!!
+
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwNylk7AZd_2kvyFflaLnseJN0flTZ1_8",
+            authDomain: "firstproj-b65e0.firebaseapp.com",
+            databaseURL: "https://firstproj-b65e0.firebaseio.com",
+            projectId: "firstproj-b65e0",
+            storageBucket: "firstproj-b65e0.appspot.com",
+            messagingSenderId: "1039411906706",
+            appId: "1:1039411906706:web:018b0e35bf9f42cc307e4b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        // Create a variable to reference the database
+        const database = firebase.database();
+
+        // Capture Button Click
+        $("#add-train").on("click", function(event) {
+            // Don't refresh the page!
+            event.preventDefault();
+
+            // YOUR TASK!!!
+
+            // Code in the logic for storing and retrieving the most recent user.
+            database.ref().on("value", function(data) {
+
+                // Print the initial data to the console.
+                console.log(data.val());
+                name = $("#name-input").val().trim();
+                dest = $("#dest-input").val().trim();
+                firstTrainTime = $("#firstTrainTime-input").val().trim();
+                freq = $("#freq-input").val().trim();
+                $("#name-data").text(name);
+                $("#dest-data").text(dest);
+                $("#firstTrainTime-data").text(firstTrainTime);
+                $("#freq-data").text(freq);
+                $("#minUntilNext-data").text("TBD");
+
+                // Don't forget to provide initial data to your Firebase database.
+                database.ref().push({
+                    name: name,
+                    dest: dest,
+                    firstTrainTime: firstTrainTime,
+                    freq: freq
+                })
+
+            });
+
+        });
+        // Firebase watcher + initial loader HINT: .on("value")
+
+        database.ref().on("value", function(data) {
+
+            // Print the initial data to the console.
+            console.log(data.val());
+            $("#name-display").text(data.val().name);
+            $("#dest-display").text(data.val().dest);
+            $("#firstTrainTime-display").text(data.val().time);
+            $("#freq-display").text(data.val().freq);
+
+            // Don't forget to provide initial data to your Firebase database.
+        });
+
+        // Create Error Handling
+
+
+        //moment().endOf('day').fromNow();          // in 13 hours
+        //moment().startOf('hour').fromNow();       // 6 minutes ago
+    </script>
+</body>
+
+</html>
