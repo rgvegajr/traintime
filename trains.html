@@ -1,194 +1,1 @@
-﻿<!DOCTYPE html>
-<html lang="en-us">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Trains</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery.js"></script>
-
-    <!-- Firebase References -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-database.js"></script>
-
-    <!-- Moment.js Reference -->
-    <script src="https://momentjs.com/downloads/moment.min.js"></script>
-
-</head>
-
-<body>
-    <div class="container">
-        <br>
-        <!-- Jumbotron -->
-        <div class="jumbotron" style="background-color: black; color: white">
-            <h1 class="text-center">Anytime is Train Time</h1>
-        </div>
-        <table class="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Train Name</th>
-                    <th scope="col">Destination</th>
-                    <th scope="col">Frequency (minutes)</th>
-                    <th scope="col">Next Arrival</th>
-                    <th scope="col">Minutes Aways</th>
-
-                </tr>
-            </thead>
-            <tbody id="new-train">
-                <tr>
-                    <th scope="row">Midnight</th>
-                    <td>Anywhere</td>
-                    <td>60</td>
-                    <td>12:00 AM</td>
-                    <td>629</td>
-                </tr>
-                <tr>
-                    <th scope="row">L Train</th>
-                    <td>Brooklyn</td>
-                    <td>20</td>
-                    <td>10:00 PM</td>
-                    <td>510</td>
-                </tr>
-                <tr>
-                    <th scope="row">M Train</th>
-                    <td>Queens</td>
-                    <td>10</td>
-                    <td>09:45 PM</td>
-                    <td>495</td>
-                </tr>
-                <tr id="new-train">
-
-                </tr>
-                <tr>
-                    <th scope="row" id="name-display"></th>
-                    <td id="dest-display"></td>
-                    <td id="freq-display"></td>
-                    <td id="nextTrainTime-display"></td>
-                    <td id="minUntilNext-display"></td>
-                </tr>
-
-            </tbody>
-        </table>
-        <form>
-            <div class="form-header">
-                <h2>Add Train</h2>
-            </div>
-            <div class="form-group">
-                <label for="name-input">Train Name</label>
-                <input class="form-control" id="name-input" type="text">
-            </div>
-            <div class="form-group">
-                <label for="dest-input">Destination</label>
-                <input class="form-control" id="dest-input" type="text">
-            </div>
-            <div class="form-group">
-                <label for="firstTrainTime-input">First Train Time (HH:mm - AM/PM)</label>
-                <input class="form-control" id="firstTrainTime-input" type="time" name="time">
-            </div>
-            <div class="form-group">
-                <label for="freq-input">Frequency (min)</label>
-                <input class="form-control" id="freq-input" type="number">
-            </div>
-            <button class="btn btn-primary" id="add-train" type="submit">Submit</button>
-        </form>
-
-    </div>
-
-    <!-- Script -->
-    <script>
-        //  START CODING BELOW!!
-        // $(document).ready(function() {
-        // Initialize Firebase
-        let firebaseConfig = {
-            apiKey: "AIzaSyDwNylk7AZd_2kvyFflaLnseJN0flTZ1_8",
-            authDomain: "firstproj-b65e0.firebaseapp.com",
-            databaseURL: "https://firstproj-b65e0.firebaseio.com",
-            projectId: "firstproj-b65e0",
-            storageBucket: "firstproj-b65e0.appspot.com",
-            messagingSenderId: "1039411906706",
-            appId: "1:1039411906706:web:018b0e35bf9f42cc307e4b"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
-        // Create a variable to reference the database
-        let database = firebase.database();
-
-        let name = "";
-        let dest = "";
-        let firstTrainTime = "";
-        let freq = "";
-        // let arrTimeArray = [];
-
-
-        // Capture Button Click
-        $("#add-train").on("click", function(event) {
-            // Don't refresh the page!
-            event.preventDefault();
-
-            name = $("#name-input").val().trim();
-            dest = $("#dest-input").val().trim();
-            firstTrainTime = moment($("#firstTrainTime-input").val().trim(), "HH:MM").format("HH:MM");
-            freq = $("#freq-input").val().trim();
-
-            //insert code to generate train schedule from inputs
-
-            database.ref().push({
-                name: name,
-                dest: dest,
-                firstTrainTime: firstTrainTime,
-                freq: freq //add comma back in when array below set
-                    // arrTimeArray: [firstTrainTime + freq]
-            });
-
-            console.log(name.name);
-            console.log(dest.dest);
-            console.log(firstTrainTime.firstTrainTime);
-            console.log(freq.freq);
-            alert("Train added");
-
-            database.ref().on("child_added", function(childSnapshot) {
-                console.log(childSnapshot.val());
-
-                let newTrain = $("<tr>").append(
-                    $("<td>").text(name),
-                    $("<td>").text(dest),
-                    $("<td>").text(firstTrainTime),
-                    $("<td>").text(freq),
-                    $("<td>").text("TBD")
-                );
-                $("#new-train").append(newTrain);
-            });
-
-            // // // Code in the logic for storing and retrieving the most recent user.
-            // database.ref().on("value", function(data) {
-
-            //     // Print the initial data to the console.
-            //     console.log(data.val());
-            //     console.log(data.val().name);
-            //     console.log(data.val().dest);
-            //     console.log(data.val().firstTrainTime);
-            //     console.log(data.val().freq);
-            //     // console.log(data.val()).arrTimeArray;
-            //     $("#name-display").text(data.val().name);
-            //     $("#dest-display").text(data.val().dest);
-            //     $("#firstTrainTime-display").text(data.val().firstTrainTime);
-            //     $("#freq-display").text(data.val().freq);
-            //     // Handle the errors
-            // }, function(errorObject) {
-            //     console.log("Errors handled: " + errorObject.code);
-            // });
-
-
-            //moment().endOf('day').fromNow();          // in 13 hours
-            //moment().startOf('hour').fromNow();       // 6 minutes ago
-
-        });
-    </script>
-</body>
-
-</html>
+﻿<!DOCTYPE html><html lang="en-us"><head>    <meta charset="UTF-8">    <title>Trains</title>    <!-- Bootstrap -->    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>    <!-- jQuery -->    <script src="https://code.jquery.com/jquery.js"></script>    <!-- Firebase References -->    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-database.js"></script>    <!-- Moment.js Reference -->    <script src="https://momentjs.com/downloads/moment.min.js"></script></head><body>    <div class="container">        <br>        <!-- Jumbotron -->        <div class="jumbotron" style="background-color: black; color: white">            <h1 class="text-center">Anytime is Train Time</h1>        </div>        <table class="table">            <thead class="thead-dark">                <tr>                    <th scope="col">Train Name</th>                    <th scope="col">Destination</th>                    <th scope="col">Frequency (minutes)</th>                    <th scope="col">Next Arrival</th>                    <th scope="col">Minutes Aways</th>                </tr>            </thead>            <tbody id="new-train">                <!--<tr>                    <th scope="row">Midnight</th>                    <td>Anywhere</td>                    <td>60</td>                    <td>12:00 AM</td>                    <td>629</td>                </tr>                <tr>                    <th scope="row">L Train</th>                    <td>Brooklyn</td>                    <td>20</td>                    <td>10:00 PM</td>                    <td>510</td>                </tr>                <tr>                    <th scope="row">M Train</th>                    <td>Queens</td>                    <td>10</td>                    <td>09:45 PM</td>                    <td>495</td>                </tr>-->                <tr id="new-train">                </tr>                <!--<tr>                    <th scope="row" id="name-display"></th>                    <td id="dest-display"></td>                    <td id="freq-display"></td>                    <td id="nextTrainTime-display"></td>                    <td id="minUntilNext-display"></td>                </tr>-->            </tbody>        </table>        <form>            <div class="form-header">                <h2>Add Train</h2>            </div>            <div class="form-group">                <label for="name-input">Train Name</label>                <input class="form-control" id="name-input" type="text">            </div>            <div class="form-group">                <label for="dest-input">Destination</label>                <input class="form-control" id="dest-input" type="text">            </div>            <div class="form-group">                <label for="firstTrainTime-input">First Train Time (HH:mm - AM/PM)</label>                <input class="form-control" id="firstTrainTime-input" type="time" name="time">            </div>            <div class="form-group">                <label for="freq-input">Frequency (min)</label>                <input class="form-control" id="freq-input" type="number">            </div>            <button class="btn btn-primary" id="add-train" type="submit">Submit</button>        </form>    </div>    <!-- Script -->    <script>        //  START CODING BELOW!!        // $(document).ready(function() {        // Initialize Firebase        let firebaseConfig = {            apiKey: "AIzaSyDwNylk7AZd_2kvyFflaLnseJN0flTZ1_8",            authDomain: "firstproj-b65e0.firebaseapp.com",            databaseURL: "https://firstproj-b65e0.firebaseio.com",            projectId: "firstproj-b65e0",            storageBucket: "firstproj-b65e0.appspot.com",            messagingSenderId: "1039411906706",            appId: "1:1039411906706:web:018b0e35bf9f42cc307e4b"        };        firebase.initializeApp(firebaseConfig);        // Create a variable to reference the database function        let database = firebase.database();        let name = "";        let dest = "";        let firstTrainTime = "";        let freq = "";        // let arrTimeArray = [];        //// Code to build and display table with existing database values at page load.        //     database.ref().on("value", function(data) {        //         // Print the initial data to the console.        //         console.log(data.val());        //         console.log(data.val().name);        //         console.log(data.val().dest);        //         console.log(data.val().firstTrainTime);        //         console.log(data.val().freq);        //         // console.log(data.val()).arrTimeArray;        //         $("#name-display").text(data.val().name);        //         $("#dest-display").text(data.val().dest);        //         $("#firstTrainTime-display").text(data.val().firstTrainTime);        //         $("#freq-display").text(data.val().freq);        //         // Handle the errors        //     }, function(errorObject) {        //         console.log("Errors handled: " + errorObject.code);        //     });        // Capture Button Click to add a train to the database and table        $("#add-train").on("click", function (event) {            // Don't refresh the page!            event.preventDefault();            name = $("#name-input").val().trim();            dest = $("#dest-input").val().trim();            firstTrainTime = moment($("#firstTrainTime-input").val().trim(), "HH:MM").format("HH:MM");            freq = $("#freq-input").val().trim();            //insert code to generate train schedule from inputs ..database is a function defined above as firebase.database()            database.ref().push({                name: name,                dest: dest,                firstTrainTime: firstTrainTime,                freq: freq, //add comma back in when array below set                // arrTimeArray: [firstTrainTime + freq]                dateAdded: firebase.database.ServerValue.TIMESTAMP            });            console.log(name.name);            console.log(dest.dest);            console.log(firstTrainTime.firstTrainTime);            console.log(freq.freq);            alert("Train added");        });        database.ref().on("child_added", function(childSnapshot) {                console.log(childSnapshot.val());                let newTrain = $("<tr>").append(                    $("<td>").text(childSnapshot.val().name),                    $("<td>").text(childSnapshot.val().dest),                    $("<td>").text(childSnapshot.val().freq),                    $("<td>").text((childSnapshot.val().firstTrainTime) + (childSnapshot.val().freq)),                    $("<td>").text("TBD")                );                $("#new-train").append(newTrain);        }, function (errorObject) {            console.log("Errors handled: " + errorObject.code);        });                      // // // Code in the logic for storing and retrieving the most recent user.            // database.ref().on("value", function(data) {            //     // Print the initial data to the console.            //     console.log(data.val());            //     console.log(data.val().name);            //     console.log(data.val().dest);            //     console.log(data.val().firstTrainTime);            //     console.log(data.val().freq);            //     // console.log(data.val()).arrTimeArray;            //     $("#name-display").text(data.val().name);            //     $("#dest-display").text(data.val().dest);            //     $("#firstTrainTime-display").text(data.val().firstTrainTime);            //     $("#freq-display").text(data.val().freq);            //     // Handle the errors            // }, function(errorObject) {            //     console.log("Errors handled: " + errorObject.code);            // });            //moment().endOf('day').fromNow();          // in 13 hours            //moment().startOf('hour').fromNow();       // 6 minutes ago        //});    </script></body></html>
