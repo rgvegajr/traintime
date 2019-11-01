@@ -91,7 +91,7 @@
             </div>
             <div class="form-group">
                 <label for="freq-input">Frequency (min)</label>
-                <input class="form-control" id="freq-input" type="time">
+                <input class="form-control" id="freq-input" type="number">
             </div>
             <button class="btn btn-primary" id="add-train" type="submit">Submit</button>
         </form>
@@ -122,27 +122,11 @@
         let dest = "";
         let firstTrainTime = "";
         let freq = "";
+        let nextTrainTime = "";
+        let minUntilNext = "";
+        let currTime = moment().format("X");
+        let diff = "";
         // let arrTimeArray = [];
-
-
-        //// Code to build and display table with existing database values at page load.
-        //     database.ref().on("value", function(data) {
-
-        //         // Print the initial data to the console.
-        //         console.log(data.val());
-        //         console.log(data.val().name);
-        //         console.log(data.val().dest);
-        //         console.log(data.val().firstTrainTime);
-        //         console.log(data.val().freq);
-        //         // console.log(data.val()).arrTimeArray;
-        //         $("#name-display").text(data.val().name);
-        //         $("#dest-display").text(data.val().dest);
-        //         $("#firstTrainTime-display").text(data.val().firstTrainTime);
-        //         $("#freq-display").text(data.val().freq);
-        //         // Handle the errors
-        //     }, function(errorObject) {
-        //         console.log("Errors handled: " + errorObject.code);
-        //     });
 
 
         // Capture Button Click to add a train to the database and table
@@ -152,24 +136,45 @@
 
             name = $("#name-input").val().trim();
             dest = $("#dest-input").val().trim();
-            firstTrainTime = $("#firstTrainTime-input").val().trim();
+            firstTrainTime = moment($("#firstTrainTime-input").val().trim(), "HH:mm").format("X");
             freq = $("#freq-input").val().trim();
 
+            console.log(currTime);
+            console.log(name);
+            console.log(dest);
+            console.log(firstTrainTime);
+            console.log(freq);
+
+
+
             //insert code to generate train schedule from inputs ..database is a function defined above as firebase.database()
+            if (firstTrainTime <= currTime) {
+                diff = currTime - firstTrainTime;
+                console.log("diff in sec=" + diff);
+                minUntilNext = (diff % freq);
+                nextTrainTime = (currTime + minUntilNext);
+            } else {
+                minUntilNext = firstTrainTime - currTime;
+                nextTrainTime = firstTrainTime;
+            };
+
+            console.log(minUntilNext);
+            console.log(nextTrainTime);
 
             database.ref().push({
                 name: name,
                 dest: dest,
                 firstTrainTime: firstTrainTime,
-                freq: freq, //add comma back in when array below set
-                // arrTimeArray: [firstTrainTime + freq]
+                freq: freq,
+                nextTrainTime: nextTrainTime,
+                minUntilNext: minUntilNext,
                 dateAdded: firebase.database.ServerValue.TIMESTAMP
             });
 
-            console.log(name.name);
-            console.log(dest.dest);
-            console.log(firstTrainTime.firstTrainTime);
-            console.log(freq.freq);
+            console.log(name);
+            console.log(dest);
+            console.log(firstTrainTime);
+            console.log(freq);
             alert("Train added");
 
         });
@@ -181,8 +186,8 @@
                 $("<td>").text(childSnapshot.val().name),
                 $("<td>").text(childSnapshot.val().dest),
                 $("<td>").text(childSnapshot.val().freq),
-                $("<td>").text((childSnapshot.val().firstTrainTime) + (childSnapshot.val().freq)),
-                $("<td>").text("TBD")
+                $("<td>").text(childSnapshot.val().nextTrainTime),
+                $("<td>").text(childSnapshot.val().minUntilNext)
             );
             $("#new-train").append(newTrain);
         }, function(errorObject) {
@@ -190,24 +195,7 @@
         });
 
 
-        // // // Code in the logic for storing and retrieving the most recent user.
-        // database.ref().on("value", function(data) {
 
-        //     // Print the initial data to the console.
-        //     console.log(data.val());
-        //     console.log(data.val().name);
-        //     console.log(data.val().dest);
-        //     console.log(data.val().firstTrainTime);
-        //     console.log(data.val().freq);
-        //     // console.log(data.val()).arrTimeArray;
-        //     $("#name-display").text(data.val().name);
-        //     $("#dest-display").text(data.val().dest);
-        //     $("#firstTrainTime-display").text(data.val().firstTrainTime);
-        //     $("#freq-display").text(data.val().freq);
-        //     // Handle the errors
-        // }, function(errorObject) {
-        //     console.log("Errors handled: " + errorObject.code);
-        // });
 
 
         //moment().endOf('day').fromNow();          // in 13 hours
