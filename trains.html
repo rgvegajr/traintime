@@ -5,18 +5,7 @@
     <meta charset="UTF-8">
     <title>Trains</title>
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery.js"></script>
-
-    <!-- Firebase References -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-database.js"></script>
-
-    <!-- Moment.js Reference -->
-    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 </head>
 
@@ -26,8 +15,9 @@
         <!-- Jumbotron -->
         <div class="jumbotron" style="background-color: black; color: white">
             <h1 class="text-center">Anytime is Train Time</h1>
+            <p id="currTimeDisplay" style="color: white"></p>
         </div>
-        <table class="table">
+        <table class="table" style="border: 1px solid black; border-style: inset ">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Train Name</th>
@@ -39,43 +29,13 @@
                 </tr>
             </thead>
             <tbody id="new-train">
-                <!--<tr>
-                    <th scope="row">Midnight</th>
-                    <td>Anywhere</td>
-                    <td>60</td>
-                    <td>12:00 AM</td>
-                    <td>629</td>
-                </tr>
-                <tr>
-                    <th scope="row">L Train</th>
-                    <td>Brooklyn</td>
-                    <td>20</td>
-                    <td>10:00 PM</td>
-                    <td>510</td>
-                </tr>
-                <tr>
-                    <th scope="row">M Train</th>
-                    <td>Queens</td>
-                    <td>10</td>
-                    <td>09:45 PM</td>
-                    <td>495</td>
-                </tr>-->
-                <tr id="new-train">
-
-                </tr>
-                <!--<tr>
-                    <th scope="row" id="name-display"></th>
-                    <td id="dest-display"></td>
-                    <td id="freq-display"></td>
-                    <td id="nextTrainTime-display"></td>
-                    <td id="minUntilNext-display"></td>
-                </tr>-->
+                <tr id="new-train"></tr>
 
             </tbody>
         </table>
-        <form>
-            <div class="form-header">
-                <h2>Add Train</h2>
+        <form style="border: 1px solid black; padding: 4px ">
+            <div class="form-header" style="background-color: black; color: white">
+                <h5 style="padding: 2px">Add Train</h5>
             </div>
             <div class="form-group">
                 <label for="name-input">Train Name</label>
@@ -87,7 +47,7 @@
             </div>
             <div class="form-group">
                 <label for="firstTrainTime-input">First Train Time (HH:mm - 24 hour time)</label>
-                <input class="form-control" id="firstTrainTime-input" type="time" name="time">
+                <input class="form-control" id="firstTrainTime-input" name="time" type="time" />
             </div>
             <div class="form-group">
                 <label for="freq-input">Frequency (min)</label>
@@ -98,9 +58,22 @@
 
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <!-- Boostrap required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- Firebase References -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-database.js"></script>
+
+    <!-- Moment.js Reference -->
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+
     <!-- Script -->
     <script>
-        //  START CODING BELOW!!
         // $(document).ready(function() {
         // Initialize Firebase
         let firebaseConfig = {
@@ -122,12 +95,14 @@
         let dest = "";
         let firstTrainTime = "";
         let freq = "";
+        let nextTrain = "";
         let nextTrainTime = "";
         let minUntilNext = "";
+        let tRemainder = "";
         let currTime = moment().format("X");
         let diff = "";
         // let arrTimeArray = [];
-
+        $("#currTimeDisplay").text("Current time is: " + moment(currTime).format("HH:mm"));
 
         // Capture Button Click to add a train to the database and table
         $("#add-train").on("click", function(event) {
@@ -145,21 +120,23 @@
             console.log(firstTrainTime);
             console.log(freq);
 
-
-
             //insert code to generate train schedule from inputs ..database is a function defined above as firebase.database()
             if (firstTrainTime <= currTime) {
-                diff = currTime - firstTrainTime;
-                console.log("diff in sec=" + diff);
-                minUntilNext = (diff % freq);
-                nextTrainTime = (currTime + minUntilNext);
+                diff = Math.round((currTime - firstTrainTime) / 60);
+                console.log("diff in min=" + diff);
+                tRemainder = diff % freq;
+                minUntilNext = freq - tRemainder;
+                console.log("if loop minUntilNext=" + minUntilNext);
+                nextTrain = moment().add(minUntilNext, "minutes");
+                nextTrainTime = moment(nextTrain).format("HH:mm");
             } else {
-                minUntilNext = firstTrainTime - currTime;
-                nextTrainTime = firstTrainTime;
+                minUntilNext = Math.round((firstTrainTime - currTime) / 60);
+                console.log("else loop minUntilNext=" + minUntilNext);
+                nextTrain = moment().add(minUntilNext, "minutes");
+                nextTrainTime = moment(nextTrain).format("HH:mm");
             };
 
-            console.log(minUntilNext);
-            console.log(nextTrainTime);
+            console.log("Next train: " + nextTrainTime);
 
             database.ref().push({
                 name: name,
@@ -171,11 +148,7 @@
                 dateAdded: firebase.database.ServerValue.TIMESTAMP
             });
 
-            console.log(name);
-            console.log(dest);
-            console.log(firstTrainTime);
-            console.log(freq);
-            alert("Train added");
+            alert("Train added!");
 
         });
 
