@@ -6,6 +6,7 @@
     <title>Trains</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/style.css">
 
 </head>
 
@@ -13,11 +14,11 @@
     <div class="container">
         <br>
         <!-- Jumbotron -->
-        <div class="jumbotron" style="background-color: black; color: white">
+        <div class="jumbotron">
             <h1 class="text-center">Anytime is Train Time</h1>
-            <p id="currTimeDisplay" style="color: white"></p>
+            <p id="currTimeDisplay"></p>
         </div>
-        <table class="table" style="border: 1px solid black; border-style: inset ">
+        <table class="table">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Train Name</th>
@@ -33,27 +34,27 @@
 
             </tbody>
         </table>
-        <form style="border: 1px solid black; padding: 4px ">
-            <div class="form-header" style="background-color: black; color: white">
-                <h5 style="padding: 2px">Add Train</h5>
+        <form>
+            <div class="form-header">
+                <h5>Add Train</h5>
             </div>
             <div class="form-group">
                 <label for="name-input">Train Name</label>
-                <input class="form-control" id="name-input" type="text">
+                <input class="form-control" id="name-input" type="text" placeholder="train name e.g. Brightline">
             </div>
             <div class="form-group">
                 <label for="dest-input">Destination</label>
-                <input class="form-control" id="dest-input" type="text">
+                <input class="form-control" id="dest-input" type="text" placeholder="destination e.g Orlando">
             </div>
             <div class="form-group">
                 <label for="firstTrainTime-input">First Train Time (HH:mm - 24 hour time)</label>
-                <input class="form-control" id="firstTrainTime-input" name="time" type="time" />
+                <input class="form-control" id="firstTrainTime-input" name="time" type="time" placeholder="e.g. 08:00" />
             </div>
             <div class="form-group">
                 <label for="freq-input">Frequency (min)</label>
-                <input class="form-control" id="freq-input" type="number">
+                <input class="form-control" id="freq-input" type="number" placeholder="e.g 45">
             </div>
-            <button class="btn btn-primary" id="add-train" type="submit">Submit</button>
+            <button class="btn btn-dark" id="add-train" type="submit">Submit</button>
         </form>
 
     </div>
@@ -73,108 +74,7 @@
     <script src="https://momentjs.com/downloads/moment.min.js"></script>
 
     <!-- Script -->
-    <script>
-        // $(document).ready(function() {
-        // Initialize Firebase
-        let firebaseConfig = {
-            apiKey: "AIzaSyDwNylk7AZd_2kvyFflaLnseJN0flTZ1_8",
-            authDomain: "firstproj-b65e0.firebaseapp.com",
-            databaseURL: "https://firstproj-b65e0.firebaseio.com",
-            projectId: "firstproj-b65e0",
-            storageBucket: "firstproj-b65e0.appspot.com",
-            messagingSenderId: "1039411906706",
-            appId: "1:1039411906706:web:018b0e35bf9f42cc307e4b"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
-        // Create a variable to reference the database function
-        let database = firebase.database();
-
-        let name = "";
-        let dest = "";
-        let firstTrainTime = "";
-        let freq = "";
-        let nextTrain = "";
-        let nextTrainTime = "";
-        let minUntilNext = "";
-        let tRemainder = "";
-        let currTime = moment().format("X");
-        let diff = "";
-        // let arrTimeArray = [];
-        $("#currTimeDisplay").text("Current time is: " + moment(currTime).format("HH:mm"));
-
-        // Capture Button Click to add a train to the database and table
-        $("#add-train").on("click", function(event) {
-            // Don't refresh the page!
-            event.preventDefault();
-
-            name = $("#name-input").val().trim();
-            dest = $("#dest-input").val().trim();
-            firstTrainTime = moment($("#firstTrainTime-input").val().trim(), "HH:mm").format("X");
-            freq = $("#freq-input").val().trim();
-
-            console.log(currTime);
-            console.log(name);
-            console.log(dest);
-            console.log(firstTrainTime);
-            console.log(freq);
-
-            //insert code to generate train schedule from inputs ..database is a function defined above as firebase.database()
-            if (firstTrainTime <= currTime) {
-                diff = Math.round((currTime - firstTrainTime) / 60);
-                console.log("diff in min=" + diff);
-                tRemainder = diff % freq;
-                minUntilNext = freq - tRemainder;
-                console.log("if loop minUntilNext=" + minUntilNext);
-                nextTrain = moment().add(minUntilNext, "minutes");
-                nextTrainTime = moment(nextTrain).format("HH:mm");
-            } else {
-                minUntilNext = Math.round((firstTrainTime - currTime) / 60);
-                console.log("else loop minUntilNext=" + minUntilNext);
-                nextTrain = moment().add(minUntilNext, "minutes");
-                nextTrainTime = moment(nextTrain).format("HH:mm");
-            };
-
-            console.log("Next train: " + nextTrainTime);
-
-            database.ref().push({
-                name: name,
-                dest: dest,
-                firstTrainTime: firstTrainTime,
-                freq: freq,
-                nextTrainTime: nextTrainTime,
-                minUntilNext: minUntilNext,
-                dateAdded: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            alert("Train added!");
-
-        });
-
-        database.ref().on("child_added", function(childSnapshot) {
-            console.log(childSnapshot.val());
-
-            let newTrain = $("<tr>").append(
-                $("<td>").text(childSnapshot.val().name),
-                $("<td>").text(childSnapshot.val().dest),
-                $("<td>").text(childSnapshot.val().freq),
-                $("<td>").text(childSnapshot.val().nextTrainTime),
-                $("<td>").text(childSnapshot.val().minUntilNext)
-            );
-            $("#new-train").append(newTrain);
-        }, function(errorObject) {
-            console.log("Errors handled: " + errorObject.code);
-        });
-
-
-
-
-
-        //moment().endOf('day').fromNow();          // in 13 hours
-        //moment().startOf('hour').fromNow();       // 6 minutes ago
-
-        //});
+    <script type="text/javascript" src="assets/javascript/app.js">
     </script>
 </body>
 
