@@ -7,7 +7,7 @@ Instructions:
 2.  Table will display name, destination, and frequency as well as the next train arrival time and how many minutes to go until the arrival from the current time.  Current time is defined as the time when the form is completed and submitted.
 
 Known Issues:
-1.  Inconsistent train departure time entry may require use of time in AM or PM versus the desired entry time in 24 hour format
+1.  Inconsistent cross-browser handling of train departure time entry may require use of time in AM or PM versus the desired entry time in 24 hour format
 
 Future Enhancements:
 1.  TBD
